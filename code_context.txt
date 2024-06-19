@@ -1,3 +1,136 @@
+// File: components/shared/Footer.tsx
+import React from 'react'
+
+const Footer = () => {
+  return (
+    <div>Footer</div>
+  )
+}
+
+export default Footer
+// File: components/shared/Header.tsx
+import Image from 'next/image'
+import Link from 'next/link'
+import React from 'react'
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+const Header = () => {
+  return (
+    <header className='w-full border-b'>
+      <div className=' flex items-center justify-between'>
+        <Link href="/" className='w-36'>
+          <Image src="/assets/images/off_logo.svg" width={128} height={38} alt='OFFRoad Logo'/>
+          <div className='flex w-32 justify-end gap-3'>
+          <SignedOut>
+            <Button asChild className="rounded-full" size="lg">
+              <Link href= "/sign-in">Login</Link>
+            </Button>
+          </SignedOut>
+          {/* <SignedIn>
+            <UserButton />
+          </SignedIn> */}
+          </div>
+        </Link>
+      </div>
+    </header>
+  )
+}
+
+export default Header
+// File: components/ui/button.tsx
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = "Button"
+
+export { Button, buttonVariants }
+
+// File: app/(root)/layout.tsx
+import Footer from "@/components/shared/Footer";
+import Header from "@/components/shared/Header";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex h-screen flex-col">
+      <Header/>
+      <main className="flex-1">{children}</main>
+      <Footer/>
+    </div>
+  );
+}
+// File: app/(root)/page.tsx
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import React from 'react';
+export default function Home() {
+  return (
+    <main>
+     
+    </main>
+  );
+}
+
+// File: app/globals.css
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -274,3 +407,43 @@ body {
 .react-datepicker__time-list-item--selected {
   background-color: #624cf5 !important;
 }
+// File: app/layout.tsx
+import type { Metadata } from "next";
+import { Poppins } from "next/font/google";
+import "./globals.css";
+import {
+  ClerkProvider,
+} from "@clerk/nextjs";
+
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-poppins',
+});
+
+export const metadata: Metadata = {
+  title: "OFFRoad",
+  description: "OFFRoad is platform for PEC events",
+  icons: {
+    icon: '/assets/images/offroad_logo.svg'
+  }
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ClerkProvider>
+      <html lang="en">
+        <body className={poppins.variable}>
+          
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
+  );
+}
+
